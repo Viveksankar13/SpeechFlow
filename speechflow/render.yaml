@@ -1,0 +1,49 @@
+services:
+  # ── Backend (FastAPI) ──
+  - type: web
+    name: speechflow-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    region: oregon
+    healthCheckPath: /health/ready
+    envVars:
+      - key: DATABASE_URL
+        sync: false  # Set manually in Render dashboard
+      - key: GEMINI_API_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: GEMINI_LIVE_MODEL
+        value: gemini-3.5-transcribe-live
+      - key: GEMINI_API_VERSION
+        value: v1beta
+      - key: FRONTEND_ORIGIN
+        sync: false  # Set to deployed frontend URL
+      - key: SESSION_COOKIE_NAME
+        value: speechflow_session
+      - key: SESSION_TTL_DAYS
+        value: "30"
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: COOKIE_SAMESITE
+        value: none
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: PORT
+        value: "8000"
+
+  # ── Frontend (Next.js) ──
+  - type: web
+    name: speechflow-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: starter
+    region: oregon
+    envVars:
+      - key: NEXT_PUBLIC_API_BASE_URL
+        sync: false  # Set to deployed backend URL
+      - key: PORT
+        value: "3000"
